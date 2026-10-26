@@ -1,0 +1,29 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.venv/
+*/venv/
+
+# Uploaded runtime images (keep samples, exclude dynamic test uploads)
+unified_car_damage_app/static/uploads/*
+!unified_car_damage_app/static/uploads/.gitkeep
+
+# Large raw datasets (downloadable on-demand via datasets/download_datasets.py)
+*.parquet
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace

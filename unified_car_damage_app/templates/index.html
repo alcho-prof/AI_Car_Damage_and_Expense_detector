@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoDamage AI — Unified Vehicle Damage, Severity & Cost Detection</title>
+    <meta name="description" content="AI-powered vehicle crash assessment: instant damage localization bounding boxes, multi-tier severity analysis, and vehicle-specific repair cost estimation.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Background Ambient Glows -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/>
+                        <circle cx="7" cy="17" r="2"/>
+                        <path d="M9 17h6"/>
+                        <circle cx="17" cy="17" r="2"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="brand-title">AutoDamage <span class="gradient-text">AI</span></h1>
+                    <p class="brand-subtitle">Unified Damage Localization, Severity Grading & Cost Estimation</p>
+                </div>
+            </div>
+
+            <!-- Currency & Status Badges -->
+            <div class="header-actions">
+                <div class="badge-chip">
+                    <span class="status-dot"></span>
+                    <span>AI Engine Online (YOLOv8 + Multi-Gate)</span>
+                </div>
+                <div class="currency-selector">
+                    <label for="currency-select">Currency:</label>
+                    <select id="currency-select" class="form-select-sm">
+                        <option value="USD" selected>USD ($)</option>
+                        <option value="INR">INR (₹)</option>
+                        <option value="EUR">EUR (€)</option>
+                        <option value="GBP">GBP (£)</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            <!-- Top Controls: Vehicle Configuration & Output Visibility Filter -->
+            <section class="control-panel glass-card">
+                <div class="panel-section">
+                    <div class="section-label">
+                        <span class="step-num">1</span>
+                        <span>Vehicle Profile (for accurate pricing):</span>
+                    </div>
+                    <div class="vehicle-selectors">
+                        <div class="input-group">
+                            <label for="brand-select">Make / Brand</label>
+                            <select id="brand-select" class="form-select">
+                                <option value="TOYOTA">Toyota</option>
+                                <option value="HONDA">Honda</option>
+                                <option value="HYUNDAI">Hyundai</option>
+                                <option value="MARUTI SUZUKI">Maruti Suzuki</option>
+                                <option value="FORD">Ford</option>
+                                <option value="BMW">BMW</option>
+                                <option value="GENERIC VEHICLE">Generic Vehicle</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="model-select">Model</label>
+                            <select id="model-select" class="form-select">
+                                <option value="Camry">Camry</option>
+                                <option value="Corolla">Corolla</option>
+                                <option value="Fortuner">Fortuner</option>
+                                <option value="Innova">Innova</option>
+                                <option value="RAV4">RAV4</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CRITICAL USER REQUIREMENT: Output Display Filter -->
+                <div class="panel-section output-filter-section">
+                    <div class="section-label">
+                        <span class="step-num">2</span>
+                        <div class="label-heading">
+                            <span>Select Outputs to Display</span>
+                            <span class="subtag">Only selected modules will be visible</span>
+                        </div>
+                    </div>
+                    
+                    <div class="output-toggle-grid">
+                        <label class="output-toggle-card active" data-target="output-bbox">
+                            <input type="checkbox" id="toggle-bbox" checked>
+                            <div class="toggle-card-content">
+                                <div class="toggle-icon icon-bbox">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" stroke-dasharray="4 4"/>
+                                        <path d="M9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"/>
+                                    </svg>
+                                </div>
+                                <div class="toggle-text">
+                                    <strong>Crash Bounding Box</strong>
+                                    <span>Damage localization & part detection</span>
+                                </div>
+                                <div class="toggle-switch"></div>
+                            </div>
+                        </label>
+
+                        <label class="output-toggle-card active" data-target="output-severity">
+                            <input type="checkbox" id="toggle-severity" checked>
+                            <div class="toggle-card-content">
+                                <div class="toggle-icon icon-severity">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                                        <line x1="12" y1="9" x2="12" y2="13"/>
+                                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                    </svg>
+                                </div>
+                                <div class="toggle-text">
+                                    <strong>Damage Severity</strong>
+                                    <span>Minor / Moderate / Severe & impact zone</span>
+                                </div>
+                                <div class="toggle-switch"></div>
+                            </div>
+                        </label>
+
+                        <label class="output-toggle-card active" data-target="output-cost">
+                            <input type="checkbox" id="toggle-cost" checked>
+                            <div class="toggle-card-content">
+                                <div class="toggle-icon icon-cost">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="12" y1="1" x2="12" y2="23"/>
+                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                    </svg>
+                                </div>
+                                <div class="toggle-text">
+                                    <strong>Cost Detection</strong>
+                                    <span>Itemized repair & part price estimation</span>
+                                </div>
+                                <div class="toggle-switch"></div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Quick Preset Filters -->
+                    <div class="quick-presets">
+                        <span class="preset-label">Quick View:</span>
+                        <button type="button" class="preset-btn active" id="preset-all">All Outputs</button>
+                        <button type="button" class="preset-btn" id="preset-bbox">Only Bounding Box</button>
+                        <button type="button" class="preset-btn" id="preset-severity">Only Severity</button>
+                        <button type="button" class="preset-btn" id="preset-cost">Only Cost Detection</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Upload Area & Presets -->
+            <section class="upload-section glass-card">
+                <div class="upload-dropzone" id="dropzone">
+                    <input type="file" id="file-input" accept="image/png, image/jpeg, image/webp" hidden>
+                    <div class="dropzone-idle" id="dropzone-idle">
+                        <div class="upload-icon-wrapper">
+                            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                        </div>
+                        <h3>Upload Damaged Car Image</h3>
+                        <p>Drag and drop image here, or <span class="browse-link">browse file</span></p>
+                        <div class="file-badges">
+                            <span>PNG</span>
+                            <span>JPG / JPEG</span>
+                            <span>WEBP</span>
+                            <span>Up to 32MB</span>
+                        </div>
+                    </div>
+                    <div class="dropzone-loading hidden" id="dropzone-loading">
+                        <div class="spinner"></div>
+                        <p class="loading-title">Analyzing Vehicle Damage...</p>
+                        <p class="loading-sub">Running YOLOv8 localization, severity scoring & cost matrices</p>
+                    </div>
+                </div>
+
+                <!-- 1-Click Demo Samples -->
+                <div class="sample-demo-bar">
+                    <span class="sample-title">Or test with demo crashes:</span>
+                    <div class="sample-buttons">
+                        <button type="button" class="sample-btn" data-sample="sample_front_collision.jpg" data-brand="TOYOTA" data-model="Camry">
+                            <span class="sample-dot red"></span>
+                            <span>Front Collision (Toyota)</span>
+                        </button>
+                        <button type="button" class="sample-btn" data-sample="sample_side_impact.jpg" data-brand="TOYOTA" data-model="RAV4">
+                            <span class="sample-dot amber"></span>
+                            <span>Side Impact (Toyota)</span>
+                        </button>
+                        <button type="button" class="sample-btn" data-sample="sample_front_breakage.jpg" data-brand="HONDA" data-model="Civic">
+                            <span class="sample-dot amber"></span>
+                            <span>Front Breakage (Honda)</span>
+                        </button>
+                        <button type="button" class="sample-btn" data-sample="sample_rear_crush.jpg" data-brand="HYUNDAI" data-model="Creta">
+                            <span class="sample-dot red"></span>
+                            <span>Rear Crush (Hyundai)</span>
+                        </button>
+                        <button type="button" class="sample-btn" data-sample="sample_rear_breakage.jpg" data-brand="MARUTI SUZUKI" data-model="Swift">
+                            <span class="sample-dot green"></span>
+                            <span>Rear Breakage (Maruti)</span>
+                        </button>
+                        <button type="button" class="sample-btn" data-sample="sample_clean_undamaged.jpg" data-brand="BMW" data-model="3 Series">
+                            <span class="sample-dot green"></span>
+                            <span>Clean Vehicle (BMW)</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-wrapper hidden" id="results-wrapper">
+                <div class="results-header-bar">
+                    <div class="results-meta">
+                        <h2>Assessment Report</h2>
+                        <span id="vehicle-tag" class="vehicle-tag">Toyota Camry</span>
+                    </div>
+                    <div class="results-actions">
+                        <button type="button" class="btn-action" id="btn-reanalyze">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                                <path d="M21 3v5h-5"/>
+                                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                                <path d="M8 16H3v5"/>
+                            </svg>
+                            <span>Recalculate</span>
+                        </button>
+                        <button type="button" class="btn-action" id="btn-print">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 6 2 18 2 18 9"/>
+                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                                <rect x="6" y="14" width="12" height="8"/>
+                            </svg>
+                            <span>Print Report</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Empty State Notice when all outputs are unchecked -->
+                <div id="no-modules-notice" class="glass-card empty-filter-notice hidden" style="text-align: center; padding: 48px 24px; border: 1px dashed rgba(255, 255, 255, 0.15); border-radius: var(--radius-lg); margin-bottom: 24px;">
+                    <div style="font-size: 36px; margin-bottom: 12px; opacity: 0.8;">⚙️</div>
+                    <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 8px;">No Outputs Selected</h3>
+                    <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 20px; font-size: 0.95rem;">All modules are currently filtered out. Enable one or more outputs above (Crash Bounding Box, Severity, or Cost Detection) to view results.</p>
+                    <button type="button" class="preset-btn active" id="btn-show-all-preset" style="display: inline-flex; align-items: center; gap: 8px; margin: 0 auto;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span>Show All Outputs</span>
+                    </button>
+                </div>
+
+                <!-- ================= OUTPUT 1: CRASH BOUNDING BOXES ================= -->
+                <div class="output-module glass-card" id="output-bbox">
+                    <div class="module-header">
+                        <div class="module-title-group">
+                            <div class="module-icon icon-bbox">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" stroke-dasharray="4 4"/>
+                                    <path d="M9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Crash Bounding Box & Damage Localization</h3>
+                                <p>Detected damaged components and morphological impact boundaries</p>
+                            </div>
+                        </div>
+                        <div class="bbox-stats">
+                            <span class="stat-pill" id="total-parts-pill">2 Parts Detected</span>
+                        </div>
+                    </div>
+
+                    <div class="bbox-display-grid">
+                        <!-- Annotated Interactive Canvas View -->
+                        <div class="image-viewport">
+                            <div class="image-stage" id="image-stage">
+                                <img id="analyzed-image" src="" alt="Analyzed Vehicle Damage">
+                                <div id="bbox-overlay" class="bbox-overlay"></div>
+                            </div>
+                            <div class="image-controls">
+                                <button type="button" class="ctrl-btn active" id="btn-toggle-boxes">Boxes On</button>
+                                <button type="button" class="ctrl-btn" id="btn-view-annotated">High-Res Annotated</button>
+                            </div>
+                        </div>
+
+                        <!-- Detected Parts Inspector List -->
+                        <div class="parts-inspector">
+                            <h4>Detected Damaged Zones</h4>
+                            <div class="parts-list" id="parts-list">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= OUTPUT 2: DAMAGE SEVERITY ================= -->
+                <div class="output-module glass-card" id="output-severity">
+                    <div class="module-header">
+                        <div class="module-title-group">
+                            <div class="module-icon icon-severity">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                                    <line x1="12" y1="9" x2="12" y2="13"/>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Damage Severity & Impact Assessment</h3>
+                                <p>Multi-gate hierarchical analysis of structural compromise and drivability</p>
+                            </div>
+                        </div>
+                        <div class="severity-badge-wrapper">
+                            <span class="severity-badge" id="overall-severity-badge">Severe (Level 3)</span>
+                        </div>
+                    </div>
+
+                    <div class="severity-grid">
+                        <!-- Severity Gauge Card -->
+                        <div class="severity-card gauge-card">
+                            <div class="gauge-ring-wrapper">
+                                <svg class="gauge-ring" viewBox="0 0 120 120">
+                                    <circle class="gauge-bg" cx="60" cy="60" r="50"/>
+                                    <circle class="gauge-progress" id="gauge-progress" cx="60" cy="60" r="50"/>
+                                </svg>
+                                <div class="gauge-center">
+                                    <span class="gauge-val" id="gauge-value">80%</span>
+                                    <span class="gauge-label">Severity Index</span>
+                                </div>
+                            </div>
+                            <div class="gauge-legend">
+                                <div class="legend-item"><span class="legend-dot green"></span>0-35% Minor</div>
+                                <div class="legend-item"><span class="legend-dot amber"></span>36-70% Moderate</div>
+                                <div class="legend-item"><span class="legend-dot red"></span>71-100% Severe</div>
+                            </div>
+                        </div>
+
+                        <!-- Impact Location & Diagnostics -->
+                        <div class="severity-card details-card">
+                            <div class="diagnostic-row">
+                                <div class="diag-icon loc-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <line x1="12" y1="8" x2="12" y2="12"/>
+                                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                    </svg>
+                                </div>
+                                <div class="diag-info">
+                                    <span class="diag-title">Primary Impact Zone</span>
+                                    <strong class="diag-value" id="impact-location">Front Impact Zone</strong>
+                                </div>
+                            </div>
+
+                            <div class="diagnostic-row">
+                                <div class="diag-icon drivable-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12v4h3"/>
+                                        <circle cx="6.5" cy="16.5" r="2.5"/>
+                                        <circle cx="16.5" cy="16.5" r="2.5"/>
+                                    </svg>
+                                </div>
+                                <div class="diag-info">
+                                    <span class="diag-title">Drivability Status</span>
+                                    <strong class="diag-value status-text" id="drivability-status">Non-Drivable (Tow Recommended)</strong>
+                                </div>
+                            </div>
+
+                            <div class="diagnostic-row">
+                                <div class="diag-icon structural-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="2" y="2" width="20" height="8" rx="2"/>
+                                        <rect x="2" y="14" width="20" height="8" rx="2"/>
+                                        <line x1="6" y1="6" x2="6.01" y2="6"/>
+                                        <line x1="6" y1="18" x2="6.01" y2="18"/>
+                                    </svg>
+                                </div>
+                                <div class="diag-info">
+                                    <span class="diag-title">Structural Compromise</span>
+                                    <span class="diag-value" id="structural-impact">High Structural Risk</span>
+                                </div>
+                            </div>
+
+                            <div class="diagnostic-row">
+                                <div class="diag-icon airbag-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <circle cx="12" cy="12" r="4"/>
+                                        <line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/>
+                                        <line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/>
+                                        <line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/>
+                                        <line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/>
+                                    </svg>
+                                </div>
+                                <div class="diag-info">
+                                    <span class="diag-title">Safety Sensor / Airbag</span>
+                                    <span class="diag-value" id="airbag-risk">Elevated Sensor Trigger Risk</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= OUTPUT 3: COST DETECTION ================= -->
+                <div class="output-module glass-card" id="output-cost">
+                    <div class="module-header">
+                        <div class="module-title-group">
+                            <div class="module-icon icon-cost">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="1" x2="12" y2="23"/>
+                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Repair Cost Detection & Financial Estimate</h3>
+                                <p>Vehicle model parts lookup, severity scaling, and body shop labor quote</p>
+                            </div>
+                        </div>
+                        <div class="total-quote-pill">
+                            <span class="quote-label">Estimated Total:</span>
+                            <span class="quote-amount" id="grand-total-amount">$486.53</span>
+                        </div>
+                    </div>
+
+                    <!-- Itemized Quote Table -->
+                    <div class="cost-table-wrapper">
+                        <table class="cost-table">
+                            <thead>
+                                <tr>
+                                    <th>Part / Component</th>
+                                    <th>Damage Type</th>
+                                    <th>Severity</th>
+                                    <th>Recommended Action</th>
+                                    <th class="text-right">Part Cost</th>
+                                    <th class="text-right">Labor & Paint</th>
+                                    <th class="text-right">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cost-table-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Cost Breakdown Summary -->
+                    <div class="cost-summary-grid">
+                        <div class="summary-card">
+                            <span class="summary-label">Parts Subtotal</span>
+                            <strong class="summary-val" id="parts-subtotal">$264.00</strong>
+                        </div>
+                        <div class="summary-card">
+                            <span class="summary-label">Labor Subtotal</span>
+                            <strong class="summary-val" id="labor-subtotal">$134.40</strong>
+                        </div>
+                        <div class="summary-card">
+                            <span class="summary-label">Paint & Consumables</span>
+                            <strong class="summary-val" id="paint-subtotal">$36.00</strong>
+                        </div>
+                        <div class="summary-card">
+                            <span class="summary-label">Estimated Taxes (12%)</span>
+                            <strong class="summary-val" id="tax-subtotal">$52.13</strong>
+                        </div>
+                        <div class="summary-card highlight-card">
+                            <span class="summary-label">Grand Total Repair Estimate</span>
+                            <strong class="summary-val primary" id="summary-grand-total">$486.53</strong>
+                        </div>
+                    </div>
+
+                    <!-- Insurance Deductible Guidance -->
+                    <div class="insurance-calculator-card">
+                        <div class="ins-col">
+                            <span class="ins-title">Estimated Comprehensive Deductible</span>
+                            <strong class="ins-num" id="ins-deductible">$97.31</strong>
+                            <span class="ins-hint">Typical 20% standard collision policy</span>
+                        </div>
+                        <div class="ins-arrow">→</div>
+                        <div class="ins-col highlight-ins">
+                            <span class="ins-title">Estimated Insurance Claim Payout</span>
+                            <strong class="ins-num green" id="ins-payout">$389.22</strong>
+                            <span class="ins-hint">Projected insurer reimbursement</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
